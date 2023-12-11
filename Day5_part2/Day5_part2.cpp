@@ -27,6 +27,7 @@ void getMap(string file, vector<relationshipMap>& map);
 long long convert(vector<relationshipMap>& map, long long id);
 vector<idRange> getSubranges(vector<relationshipMap>& map, idRange range);
 vector<idRange> iterativeSubranges(vector<relationshipMap>& map, vector<idRange>& ranges);
+bool verifyLossless(vector<idRange> ranges, long long range);
 
 
 int main()
@@ -82,18 +83,46 @@ int main()
         seeds.end = id + duration - 1;
         //get vector of ranges of soils.
         vector<idRange> soils = getSubranges(seedToSoil, seeds);
+        if (!verifyLossless(soils, duration))
+        {
+            std::cout << "incorrect range returned from seedToSoil" << std::endl;
+        }
 
         vector<idRange> fertilizers = iterativeSubranges(soilToFertilizer, soils);
+        if (!verifyLossless(fertilizers, duration))
+        {
+            std::cout << "incorrect range returned from soilToFertilizer" << std::endl;
+        }
 
         vector<idRange> waters = iterativeSubranges(fertilizerToWater, fertilizers);
+        if (!verifyLossless(waters, duration))
+        {
+            std::cout << "incorrect range returned from fertilizerToWater" << std::endl;
+        }
 
         vector<idRange> lights = iterativeSubranges(waterToLight, waters);
+        if (!verifyLossless(lights, duration))
+        {
+            std::cout << "incorrect range returned from waterToLight" << std::endl;
+        }
 
         vector<idRange> temperatures = iterativeSubranges(lightToTemperature, lights);
+        if (!verifyLossless(temperatures, duration))
+        {
+            std::cout << "incorrect range returned from lightToTemperature" << std::endl;
+        }
 
         vector<idRange> humidities = iterativeSubranges(temperatureToHumidity, temperatures);
+        if (!verifyLossless(humidities, duration))
+        {
+            std::cout << "incorrect range returned from temperatureToHumidity" << std::endl;
+        }
 
         vector<idRange> locations = iterativeSubranges(humidityToLocation, humidities);
+        if (!verifyLossless(locations, duration))
+        {
+            std::cout << "incorrect range returned from humidityToLocation" << std::endl;
+        }
 
         //check the locations for the minimum
         for (int i = 0; i < locations.size(); ++i)
@@ -246,4 +275,14 @@ vector<idRange> iterativeSubranges(vector<relationshipMap>& map, vector<idRange>
         newRanges.insert(newRanges.end(), temp.begin(), temp.end());
     }
     return newRanges;
+}
+
+bool verifyLossless(vector<idRange> ranges, long long range)
+{
+    int distance = 0;
+    for (int i = 0; i < ranges.size(); ++i)
+    {
+        distance += ranges.at(i).end - ranges.at(i).start + 1;
+    }
+    return distance == range;
 }
