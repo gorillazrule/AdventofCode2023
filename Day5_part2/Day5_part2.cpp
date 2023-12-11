@@ -205,9 +205,28 @@ vector<idRange> getSubranges(vector<relationshipMap>& map, idRange range)
             idRange converted;
             long long leftOffset = tempRange.start - mapSourceStart;
             converted.start = mapDestinationStart + leftOffset;
-            converted.end = mapDestinationEnd;
+            converted.end = mapDestinationEnd -1;
             subranges.push_back(converted);
             tempRange.start = mapSourceEnd;
+        }
+        
+        //if the range starts before the mapping, but ends after it
+        if (tempRange.start < mapSourceStart && tempRange.end >= mapSourceEnd)
+        {
+            //Map the range 1 to 1 until you hit the start of the map
+            tempRange.end = mapSourceStart - 1;
+            subranges.push_back(tempRange);
+            
+            //Add the entirety of the map destination range
+            idRange converted;
+            converted.start = mapDestinationStart;
+            converted.end = mapDestinationEnd -1;
+            subranges.push_back(converted);
+
+            //Set the tempRange beginning to the end of the map range, and fix the end.
+            tempRange.start = mapSourceEnd;
+            tempRange.end = range.end;
+
         }
     }
 
