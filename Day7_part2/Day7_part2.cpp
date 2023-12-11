@@ -1,4 +1,4 @@
-// Day7_part1.cpp :
+// Day7_part2.cpp : 
 
 #include <iostream>
 #include <fstream>
@@ -40,6 +40,7 @@ int main()
 
     std::sort(hands.begin(), hands.end());
 
+    //unsigned long winnings;
     int winnings = 0;
 
     for (int i = 0; i < hands.size(); ++i)
